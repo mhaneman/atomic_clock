@@ -1,12 +1,14 @@
 from hardware_io import Instr
-import data_collection
+from data_collection import DataCollection
 
 
 ''' <--- global variables --> '''
 base_freq = 6_834_682_610
-freq_low = base_freq + 7700
-freq_high = base_freq + 8600
+# freq_low = base_freq + 7700
+# freq_high = base_freq + 8600
 
+freq_low = base_freq + 7900
+freq_high = base_freq + 8300
 
 
 ''' <--- initalize devices ---> '''
@@ -30,12 +32,13 @@ SG386.write_and_verify('AMPH', -10)
 SG386.write_and_verify('ENBH', 1)
 
 ''' <--- collect data ---> '''
-# this is ugly! -> refactor this
-data_collection.basic_scan(
-    SG386=SG386, SR830=SR830, 
+clock_interface = DataCollection(freq_inst=SG386, intensity_inst=SR830)
+res_freq = clock_interface.res_freq_scan(
     base_freq=base_freq, 
     freq_low=freq_low, 
     freq_high=freq_high)
+
+print("detuning freq resonance", res_freq)
 
 ''' <--- terminate devices ---> '''
 SG386.write_and_verify('ENBH', 0) # turn off microwaves at the end of scanning?

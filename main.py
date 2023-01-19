@@ -1,5 +1,5 @@
 from hardware_io import Instr
-from data_collection import DataCollection
+from clock_interface import ClockInterface
 
 
 ''' <--- global variables --> '''
@@ -32,7 +32,7 @@ SG386.write_and_verify('AMPH', -10)
 SG386.write_and_verify('ENBH', 1)
 
 ''' <--- collect data ---> '''
-clock_interface = DataCollection(freq_inst=SG386, intensity_inst=SR830)
+clock_interface = ClockInterface(freq_inst=SG386, intensity_inst=SR830)
 res_freq = clock_interface.res_freq_scan(
     base_freq=base_freq, 
     freq_low=freq_low, 

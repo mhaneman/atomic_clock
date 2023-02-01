@@ -4,6 +4,7 @@ from clock_interface import ClockInterface
 
 
 ''' ~~~~~~~~~~ GLOBAL SETTINGS ~~~~~~~~~~ '''
+MOCKING_FILE_PATH = "mock_data/sample_run.txt"
 MOCKING = False  # use data from mock file to simulate experiment
 
 
@@ -38,10 +39,15 @@ SG386.write_and_verify('AMPH', -10)
 
 
 ''' <--- data collection ---> '''
-clock_interface = ClockInterface(freq_inst=SG386, intensity_inst=SR830)
+clock_interface = ClockInterface(
+    freq_inst=SG386, 
+    intensity_inst=SR830, 
+    is_mocking = MOCKING,
+    mocking_file_path = MOCKING_FILE_PATH)
+
 time.sleep(3)
 
-clock_interface.res_freq_scan(
+clock_interface.single_scan(
     freq_base=freq_base,
     freq_low=freq_low,
     freq_high=freq_high)

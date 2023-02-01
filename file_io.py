@@ -1,14 +1,13 @@
 import csv
 import os
+import numpy as np
 
 def read_data_csv(filename):
     data = []
-
     with open(filename, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            data.append(row)
-            data.append(row)
+            data.append([float(s) for s in row])
     
     if len(data) != 2:
         print("corrupted csv file")

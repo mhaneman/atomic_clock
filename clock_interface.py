@@ -9,13 +9,34 @@ class ClockInterface:
     def __init__(self, freq_inst, intensity_inst, mock_settings):
         self.freq_inst = freq_inst
         self.intensity_inst = intensity_inst
+        
         self.is_mocking = mock_settings["MOCKING"]
         self.is_mock_save = mock_settings["MOCK_SAVE"]
         self.mock_filepath = mock_settings["MOCK_FILEPATH"]
-        self.mock_dir = mock_settings["MOCK_DIR"] 
+        self.mock_dir = mock_settings["MOCK_DIR"]
+        self.setup()
+
+
+    # setup instruments, if needed
+    def setup(self):
+        if not self.is_mocking:
+            if self.freq_inst.instr is not None:
+                self.freq_inst.setup_config()
+            if self.intensity_inst.instr is not None:
+                self.intensity_inst.setup_config()
+            time.sleep(3)
+
+    # terminate instruments, if needed
+    def terminate(self):
+        if not self.is_mocking:
+            if self.freq_inst.instr is not None:
+                self.freq_inst.term_config()
+            if self.intensity_inst.instr is not None:
+                self.intensity_inst.term_config()
+
 
     # use sample data saved locally
-    def get_mocking_data(self, freq_low, freq_high):
+    def get_mocking_data(self, freq_base, freq_low, freq_high):
         x_data, y_data = file_io.read_data_csv(self.mock_filepath)
         return x_data, y_data
 
@@ -34,10 +55,10 @@ class ClockInterface:
         return freq_data, intensity_data
 
 
-    # wrapper for getting data
+    # wrapper for getting data (mocking or live)
     def get_data(self, freq_base, freq_low, freq_high):
         if self.is_mocking:
-            return self.get_mocking_data(freq_low, freq_high)
+            return self.get_mocking_data(freq_base, freq_low, freq_high)
         
         # maybe do some error checking here
         x_data, y_data = self.get_live_data(freq_base, freq_low, freq_high)
@@ -54,9 +75,7 @@ class ClockInterface:
             x_data=freq_data,
             y_data=intensity_data)
 
-        scan_plot = PlotObject(
-            x_label="detune freq [Hz]", 
-            y_label="Intensity")
+        scan_plot = PlotObject(x_label="detune freq [Hz]", y_label="Intensity")
         scan_plot.plot_line(x_data=freq_data, y_data=intensity_data, label="measured")
         scan_plot.plot_line(x_data=freq_data, y_data=fit_y, label="guass fit")
         scan_plot.show_plot()
@@ -72,7 +91,7 @@ class ClockInterface:
         res_freqs = []
         res_times = []
 
-        for n in tqdm(range(10), desc="scanning..."):
+        for _ in tqdm(range(10), desc="scanning..."):
             scan = self.single_scan(
                 freq_base=freq_base, 
                 freq_low=freq_low, 
@@ -81,9 +100,9 @@ class ClockInterface:
             res_freqs.append(scan)
             res_times.append(time.time() - start_t) 
 
-        cont_scan_plot = PlotObject(
+        plot = PlotObject(
             x_label="ellapsed time [S]",
             y_label="detuning frequency [Hz]",
             show_annotate=True)
 
-        cont_scan_plot.plot_points(res_times, res_freqs)
+        plot.plot_points(res_times, res_freqs)

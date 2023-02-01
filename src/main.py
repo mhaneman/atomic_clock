@@ -1,7 +1,7 @@
 import time
 from hardware_io import Instr
 from clock_interface import ClockInterface
-from data_analysis import DataAnalysis
+from data_analysis import FreqAnalysis
 
 
 ''' ~~~~~~~~~~ SETTINGS ~~~~~~~~~~ '''
@@ -63,16 +63,16 @@ clock_interface = ClockInterface(
 detune_low = 7700
 detune_high = 8600
 
-data_analysis = DataAnalysis(
+freq_analysis = FreqAnalysis(
     interface = clock_interface,
     freq_base = 6_834_682_610
 )
 
-data_analysis.single_scan(
+freq_analysis.single_scan(
     detune_low=detune_low,
     detune_high=detune_high)
 
-data_analysis.cont_scan(
+freq_analysis.cont_scan(
     detune_low=detune_low,
     detune_high=detune_high)
 

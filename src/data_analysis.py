@@ -5,7 +5,7 @@ from plotting import PlotObject
 import modeling
 
 
-class DataAnalysis:
+class FreqAnalysis:
     def __init__(self, interface, freq_base) -> None:
         self.interface = interface
         self.freq_base = freq_base
@@ -27,7 +27,6 @@ class DataAnalysis:
         scan_plot.show_plot()
 
         res_freq, res_intensity = modeling.find_min_val(freq_data[2:], intensity_data[2:])
-        print("res freq found: ", res_freq)
         return res_freq
 
 

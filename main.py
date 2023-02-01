@@ -3,18 +3,41 @@ from hardware_io import Instr
 from clock_interface import ClockInterface
 
 
-''' ~~~~~~~~~~ GLOBAL SETTINGS ~~~~~~~~~~ '''
-MOCKING_FILE_PATH = "mock_data/sample_run.txt"
-MOCKING = False  # use data from mock file to simulate experiment
+''' ~~~~~~~~~~ SETTINGS ~~~~~~~~~~ '''
+mock_settings = {
+    "MOCK_DIR": "mock_data/",
+    "MOCK_FILEPATH": "mock_data/mock_run_1.csv",
+    "MOCKING": False, # use data from mock file to simulate experiment
+    "MOCK_RAND": False, # if true, a random file from the mock_data directory will be chosen for dat
+    "MOCK_SAVE": True # if true, the measured, live scan will be saved as a mock file
+}
+
+SR830_settings = {
+    'SENS': 8,
+    'ILIN': 3,
+    'RMOD': 1,
+    'OFLT': 10,
+    'ISRC': 0,
+    'ICPL': 0,
+    'IGND': 0
+}
+
+SG386_settings = {
+    'ENBH': 1,
+    'TYPE': 3,
+    'SRAT': 10,
+    'SFNC': 0,
+    'MODL': 1, # configure modulation before being turned on
+    'AMPH': -10
+}
 
 
 ''' ~~~~~~~~~~ EXPERIMENT VARIABLES  ~~~~~~~~~~ '''
-
 freq_base = 6_834_682_610
-# freq_low = base_freq + 7700
-# freq_high = base_freq + 8600
-freq_low = freq_base + 8150
-freq_high = freq_base + 8300
+freq_low = freq_base + 7700
+freq_high = freq_base + 8600
+# freq_low = freq_base + 8150
+# freq_high = freq_base + 8300
 
 
 ''' <--- initalize devices ---> '''
@@ -42,8 +65,7 @@ SG386.write_and_verify('AMPH', -10)
 clock_interface = ClockInterface(
     freq_inst=SG386, 
     intensity_inst=SR830, 
-    is_mocking = MOCKING,
-    mocking_file_path = MOCKING_FILE_PATH)
+    mock_settings = mock_settings)
 
 time.sleep(3)
 

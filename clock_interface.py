@@ -1,24 +1,24 @@
 import time
 from tqdm import tqdm
 
-from plots import PlotObject
+from plotting import PlotObject
 import modeling
+import file_io
 
 class ClockInterface:
-    def __init__(self, freq_inst, intensity_inst, is_mocking, mocking_file_path):
+    def __init__(self, freq_inst, intensity_inst, mock_settings):
         self.freq_inst = freq_inst
         self.intensity_inst = intensity_inst
-        self.is_mocking = is_mocking
-        self.mocking_file_path = mocking_file_path
+        self.is_mocking = mock_settings["MOCKING"]
+        self.is_mock_save = mock_settings["MOCK_SAVE"]
+        self.mock_filepath = mock_settings["MOCK_FILEPATH"]
+        self.mock_dir = mock_settings["MOCK_DIR"] 
 
     # use sample data saved locally
     def get_mocking_data(self, freq_low, freq_high):
-        x_data = []
-        y_data = []
-        with open(self.mocking_file_path, 'r') as file:
-            pass
-
+        x_data, y_data = file_io.read_data_csv(self.mock_filepath)
         return x_data, y_data
+
 
     # use clock hardware to get data
     def get_live_data(self, freq_base, freq_low, freq_high):
@@ -38,7 +38,12 @@ class ClockInterface:
     def get_data(self, freq_base, freq_low, freq_high):
         if self.is_mocking:
             return self.get_mocking_data(freq_low, freq_high)
-        return self.get_live_data(freq_base, freq_low, freq_high)
+        
+        # maybe do some error checking here
+        x_data, y_data = self.get_live_data(freq_base, freq_low, freq_high)
+        if self.is_mock_save:
+            file_io.save_data_csv(dir=self.mock_dir, x_data=x_data, y_data=y_data)
+        return x_data, y_data
 
 
     # return information about scanned data

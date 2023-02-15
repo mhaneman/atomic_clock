@@ -5,15 +5,15 @@ from data_analysis import FreqAnalysis
 
 
 ''' ~~~~~~~~~~ SETTINGS ~~~~~~~~~~ '''
-mock_settings = {
+clock_settings = {
     "MOCK_DIR": "../mock_data/",
     "MOCK_FILEPATH": "../mock_data/mock_run_1.csv",
-    "MOCK_RAND": False, # if true, a random file from the mock_data directory will be chosen for data
+    "MOCK_RAND": True, # if true, a random file from the mock_data directory will be chosen for data
     "MOCK_SAVE": True, # if true, the live scan will be saved as a mock file
-    "MOCKING": True, # use data from mock file to simulate experiment
+    "MOCKING": True, # if true, use data from mock file to simulate experiment
 }
 
-SR830_setup_config = {
+SR830_setup_commands = {
     'SENS': 8,
     'ILIN': 3,
     'RMOD': 1,
@@ -23,9 +23,11 @@ SR830_setup_config = {
     'IGND': 0
 }
 
-SR830_term_config = {}
+SR830_term_commands = {
+    
+}
 
-SG386_setup_config = {
+SG386_setup_commands = {
     'ENBH': 1,
     'TYPE': 3,
     'SRAT': 10,
@@ -34,7 +36,7 @@ SG386_setup_config = {
     'AMPH': -10
 }
 
-SG386_term_config = {
+SG386_term_commands = {
     'ENBH': 0
 }
 
@@ -43,25 +45,24 @@ SG386_term_config = {
 SR830 = Instr(
     resource = 'GPIB0::8::INSTR', 
     baud_rate = 9600, 
-    setup_config = SR830_setup_config, 
-    term_config = SR830_term_config)
+    setup_commands = SR830_setup_commands, 
+    term_commands = SR830_term_commands)
 
 SG386 = Instr(
     resource = 'GPIB0::27::INSTR', 
     baud_rate = 11500, 
-    setup_config = SG386_setup_config, 
-    term_config = SG386_term_config)
-
-
-clock_interface = ClockInterface(
-    freq_inst=SG386, 
-    intensity_inst=SR830, 
-    mock_settings = mock_settings)
+    setup_commands = SG386_setup_commands, 
+    term_commands = SG386_term_commands)
 
 
 ''' <--- data analysis ---> '''
 detune_low = 7700
 detune_high = 8600
+
+clock_interface = ClockInterface(
+    freq_inst=SG386, 
+    intensity_inst=SR830, 
+    clock_settings = clock_settings)
 
 freq_analysis = FreqAnalysis(
     interface = clock_interface,

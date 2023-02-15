@@ -1,20 +1,17 @@
 import time
 from tqdm import tqdm
-
-from plotting import PlotObject
-import modeling
 import file_io
 
 class ClockInterface:
-    def __init__(self, freq_inst, intensity_inst, mock_settings):
+    def __init__(self, freq_inst, intensity_inst, clock_settings):
         self.freq_inst = freq_inst
         self.intensity_inst = intensity_inst
         
-        self.is_mocking = mock_settings["MOCKING"]
-        self.is_mock_save = mock_settings["MOCK_SAVE"]
-        self.is_mock_rand = mock_settings["MOCK_RAND"]
-        self.mock_filepath = mock_settings["MOCK_FILEPATH"]
-        self.mock_dir = mock_settings["MOCK_DIR"]
+        self.is_mocking = clock_settings["MOCKING"]
+        self.is_mock_save = clock_settings["MOCK_SAVE"]
+        self.is_mock_rand = clock_settings["MOCK_RAND"]
+        self.mock_filepath = clock_settings["MOCK_FILEPATH"]
+        self.mock_dir = clock_settings["MOCK_DIR"]
         self.setup()
     
     """ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ """
@@ -34,24 +31,24 @@ class ClockInterface:
 
     """ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ """
 
-    # use sample data saved locally
-    def get_mocking_data(self, freq_base, freq_low, freq_high):
-        # only return from the specified range
-        x_data, y_data = file_io.read_data_csv(self.mock_filepath)
-        return x_data, y_data
-
-
     # wrapper for getting data (mocking or live)
     def get_data(self, freq_base, freq_low, freq_high):
         if self.is_mocking:
             if self.is_mock_rand:
-                # get random file to mock
-                pass
-            return self.get_mocking_data(freq_base, freq_low, freq_high)
+                file = self.mock_dir + file_io.get_random_file(self.mock_dir)
+                return self.get_mocking_data(file)
+            return self.get_mocking_data(self.mock_filepath)
         
         x_data, y_data = self.get_live_data(freq_base, freq_low, freq_high)
         if self.is_mock_save:
             file_io.save_data_csv(dir=self.mock_dir, x_data=x_data, y_data=y_data)
+        return x_data, y_data
+
+
+    # use sample data saved locally
+    def get_mocking_data(self, file):
+        # only return from the specified range
+        x_data, y_data = file_io.read_data_csv(file)
         return x_data, y_data
 
 

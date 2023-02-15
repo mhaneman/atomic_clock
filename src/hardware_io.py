@@ -3,10 +3,10 @@ import time
 import sys
 
 class Instr:
-    def __init__(self, resource, baud_rate, setup_config, term_config, timeout=1000) -> None:
+    def __init__(self, resource, baud_rate, setup_commands, term_commands, timeout=1000) -> None:
         self.name = resource
-        self.setup_config = setup_config
-        self.term_config = term_config
+        self.setup_commands = setup_commands
+        self.term_commands = term_commands
 
         try:
             rm = pyvisa.ResourceManager()
@@ -21,12 +21,12 @@ class Instr:
         if self.instr is None:
             print(self.name + " cannot be setup. Exiting Program", file=sys.stderr)
 
-        for command, value in self.setup_config:
+        for command, value in self.setup_commands.items():
             self.write_and_verify(command, value)
 
     def term_config(self):
         if self.instr is not None:
-            for command, value in self.term_config:
+            for command, value in self.term_commands.items():
                 self.write_and_verify(command, value)
 
 

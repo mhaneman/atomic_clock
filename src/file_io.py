@@ -1,5 +1,8 @@
 import csv
 import sys
+import os
+import datetime
+import random
 
 def read_data_csv(filename):
     data = []
@@ -17,9 +20,14 @@ def save_data_csv(dir, x_data, y_data):
     if len(x_data) != len(y_data):
         print("Error when saving file! The dimensions of x_data and y_data are unequal", file=sys.stderr)
     
-    filename = dir + "mock_run_1.csv"
+    filename = dir + "mock_run_" + str(datetime.datetime.now()) + ".csv"
     with open(filename, 'w') as file:
         writer = csv.writer(file)
         writer.writerow(x_data)
         writer.writerow(y_data)
         file.close()
+
+def get_random_file(path):
+    dir_list = os.listdir(path)
+    return random.choice(dir_list)
+

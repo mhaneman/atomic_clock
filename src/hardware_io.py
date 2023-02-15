@@ -1,13 +1,34 @@
 import pyvisa
 import time
-rm = pyvisa.ResourceManager()
+import sys
 
 class Instr:
-    def __init__(self, resource, baud_rate, timeout=1000) -> None:
+    def __init__(self, resource, baud_rate, setup_commands, term_commands, timeout=1000) -> None:
         self.name = resource
-        self.instr = rm.open_resource(resource)
-        self.instr.baud_rate = baud_rate
-        self.instr.timeout = timeout
+        self.setup_commands = setup_commands
+        self.term_commands = term_commands
+
+        try:
+            rm = pyvisa.ResourceManager()
+            self.instr = rm.open_resource(resource)
+            self.instr.baud_rate = baud_rate
+            self.instr.timeout = timeout
+        except Exception:
+            self.instr = None
+            print(self.name + " cannot be initalized.")
+
+    def setup_config(self):
+        if self.instr is None:
+            print(self.name + " cannot be setup. Exiting Program", file=sys.stderr)
+
+        for command, value in self.setup_commands.items():
+            self.write_and_verify(command, value)
+
+    def term_config(self):
+        if self.instr is not None:
+            for command, value in self.term_commands.items():
+                self.write_and_verify(command, value)
+
 
     # returns value read from hardware
     def query(self, command):

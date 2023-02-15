@@ -56,6 +56,7 @@ SG386 = Instr(
 
 
 ''' <--- data analysis ---> '''
+freq_base = 6_834_682_610
 detune_low = 7700
 detune_high = 8600
 
@@ -65,8 +66,8 @@ clock_interface = ClockInterface(
     clock_settings = clock_settings)
 
 freq_analysis = FreqAnalysis(
-    interface = clock_interface,
-    freq_base = 6_834_682_610
+    interface=clock_interface,
+    freq_base=freq_base
 )
 
 freq_analysis.single_scan(

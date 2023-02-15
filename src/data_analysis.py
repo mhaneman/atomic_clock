@@ -1,7 +1,7 @@
 from tqdm import tqdm
 import time
 
-from plotting import PlotObject
+from graphics import PlotObject
 import modeling
 
 

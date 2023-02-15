@@ -16,6 +16,7 @@ def read_data_csv(filename):
     
     return data[0], data[1]
 
+
 def save_data_csv(dir, x_data, y_data):
     if len(x_data) != len(y_data):
         print("Error when saving file! The dimensions of x_data and y_data are unequal", file=sys.stderr)
@@ -26,6 +27,7 @@ def save_data_csv(dir, x_data, y_data):
         writer.writerow(x_data)
         writer.writerow(y_data)
         file.close()
+
 
 def get_random_file(path):
     dir_list = os.listdir(path)

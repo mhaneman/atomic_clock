@@ -10,8 +10,9 @@ class ClockInterface:
         self.is_mocking = clock_settings["MOCKING"]
         self.is_mock_save = clock_settings["MOCK_SAVE"]
         self.is_mock_rand = clock_settings["MOCK_RAND"]
-        self.mock_filepath = clock_settings["MOCK_FILEPATH"]
+        self.mock_filepath = clock_settings["MOCKING_FILE"]
         self.mock_dir = clock_settings["MOCK_DIR"]
+        self.warmup_time = clock_settings["WARMUP_TIME"]
         self.setup()
     
     """ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ """
@@ -21,7 +22,7 @@ class ClockInterface:
         if not self.is_mocking:
             self.freq_inst.setup_config()
             self.intensity_inst.setup_config()
-            time.sleep(3)
+            time.sleep(self.warmup_time)
 
     # terminate instruments, if needed
     def terminate(self):
@@ -36,8 +37,8 @@ class ClockInterface:
         if self.is_mocking:
             if self.is_mock_rand:
                 file = self.mock_dir + file_io.get_random_file(self.mock_dir)
-                return self.get_mocking_data(file)
-            return self.get_mocking_data(self.mock_filepath)
+                return self.get_mocking_data(file, freq_base, freq_low, freq_high)
+            return self.get_mocking_data(self.mock_filepath, freq_base, freq_low, freq_high)
         
         x_data, y_data = self.get_live_data(freq_base, freq_low, freq_high)
         if self.is_mock_save:
@@ -46,10 +47,11 @@ class ClockInterface:
 
 
     # use sample data saved locally
-    def get_mocking_data(self, file):
-        # only return from the specified range
+    def get_mocking_data(self, file, freq_base, freq_low, freq_high):
         x_data, y_data = file_io.read_data_csv(file)
-        return x_data, y_data
+        low = x_data.index(freq_low - freq_base)
+        high = x_data.index(freq_high - freq_base)
+        return x_data[low:high], y_data[low:high]
 
 
     # use clock hardware to get data
@@ -64,3 +66,9 @@ class ClockInterface:
             intensity_data.append(float(measured_intensity))
 
         return freq_data, intensity_data
+
+
+    def get_live_data_at(self, freq):
+        self.freq_inst.write('FREQ', freq)
+        measured_intensity = self.intensity_inst.query('OUTP?3')
+        return float(measured_intensity)

@@ -1,10 +1,5 @@
 import matplotlib.pyplot as plt
 
-class DashboardGUI:
-    def __init(self,):
-        pass
-
-
 class PlotObject:
     def __init__(self, x_label="", y_label="", show_annotate=False) -> None:
         self.x_label = x_label

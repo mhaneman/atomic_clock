@@ -6,11 +6,12 @@ from data_analysis import FreqAnalysis
 
 ''' ~~~~~~~~~~ SETTINGS ~~~~~~~~~~ '''
 clock_settings = {
+    "WARMUP_TIME": 3, # time given for the hardware to warmup
     "MOCK_DIR": "../mock_data/",
-    "MOCK_FILEPATH": "../mock_data/mock_run_1.csv",
+    "MOCKING_FILE": "../mock_data/mock_run_1.csv",
+    "MOCKING": True, # if true, use data from mock file to simulate experiment
     "MOCK_RAND": True, # if true, a random file from the mock_data directory will be chosen for data
     "MOCK_SAVE": True, # if true, the live scan will be saved as a mock file
-    "MOCKING": True, # if true, use data from mock file to simulate experiment
 }
 
 SR830_setup_commands = {
@@ -57,8 +58,10 @@ SG386 = Instr(
 
 ''' <--- data analysis ---> '''
 freq_base = 6_834_682_610
-detune_low = 7700
-detune_high = 8600
+# detune_low = 7700
+# detune_high = 8600
+detune_low = 8200
+detune_high = 8300
 
 clock_interface = ClockInterface(
     freq_inst=SG386, 

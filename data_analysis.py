@@ -17,7 +17,7 @@ class FreqAnalysis:
             detune_low + self.freq_base, 
             detune_high + self.freq_base)
 
-        fit_y = modeling.gauss_fit(
+        fit_y = modeling.lorentzain_fit(
             x_data=freq_data,
             y_data=intensity_data)
 

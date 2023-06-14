@@ -8,11 +8,24 @@ class PlotObject:
 
 
     def plot_line(self, x_data, y_data, label=""):
-        plt.plot(x_data, y_data, label=label)
+        plt.plot(x_data, y_data, label=label, color="r")
+
+    
+    def plot_errorbars(self, x_data, y_data, y_data_error, label=""):
+        plt.errorbar(x_data, y_data, yerr=y_data_error, 
+                     label=label, 
+                     fmt='o', 
+                     barsabove=True)
 
 
-    def plot_points(self, x_data, y_data, x_error=[], y_error=[], label=""):
-        plt.scatter(x_data, y_data, label="")
+        if self.show_annotate:
+            for i in range(len(x_data)):
+                    plt.annotate(x_data[i], (y_data[i], x_data[i]))
+
+
+    def plot_points(self, x_data, y_data, label=""):
+        plt.scatter(x_data, y_data, label=label, s=1)
+
 
         if self.show_annotate:
             for i in range(len(x_data)):
@@ -23,7 +36,8 @@ class PlotObject:
         plt.xlabel = self.x_label
         plt.ylabel = self.y_label
         plt.legend()
-        plt.show()
+        # plt.savefig("./images/test.png")
+        plt.show(block=True) 
 
         
     

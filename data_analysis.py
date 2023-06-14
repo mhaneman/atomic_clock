@@ -4,6 +4,8 @@ import time
 from graphics import PlotObject
 import modeling
 
+import numpy as np
+
 
 class FreqAnalysis:
     def __init__(self, interface, freq_base) -> None:
@@ -12,44 +14,65 @@ class FreqAnalysis:
 
     # return information about scanned data
     def single_scan(self, detune_low, detune_high):
+
+        # get raw data into two arrays
         freq_data, intensity_data = self.interface.get_data(
             self.freq_base, 
             detune_low + self.freq_base, 
             detune_high + self.freq_base)
+        
+        min_index = freq_data.index(8150)
+        max_index = freq_data.index(8300)
+        
+        min_y = min(intensity_data[min_index:max_index])
+        min_y_index = intensity_data.index(min_y)
+        
 
-        # fit_y = modeling.lorentzain_fit(
-        #     x_data=freq_data,
-        #     y_data=intensity_data)
+        W = 20
+        x_data = freq_data[min_y_index-W : min_y_index+W]
+        y_data = intensity_data[min_y_index-W : min_y_index+W]
 
-        # scan_plot = PlotObject(x_label="detune freq [Hz]", y_label="Intensity")
-        # scan_plot.plot_line(x_data=freq_data, y_data=intensity_data, label="measured")
-        # scan_plot.plot_line(x_data=freq_data, y_data=fit_y, label="modified guass fit")
-        # scan_plot.show_plot()
+        fit_y, fit_y_error = modeling.modified_gauss_fit(
+            x_data=x_data,
+            y_data=y_data)
 
-        # res_freq, res_intensity = modeling.find_min_val(freq_data[2:], intensity_data[2:])
-        # return res_freq
+        scan_plot = PlotObject(x_label="detune freq [Hz]", y_label="Intensity")
+        scan_plot.plot_points(x_data=freq_data, y_data=intensity_data, label="measured")
+        scan_plot.plot_line(x_data=x_data, y_data=fit_y, label="modified guass fit")
+        scan_plot.show_plot()
 
-        return None
+        # if fit_y is None:
+        #     return None, None
+        
+        # min_y_index = fit_y.argmin()
+        # return x_data[min_y_index], abs(fit_y[min_y_index] / (fit_y_error[min_y_index] * 2))
 
 
     # continous scanning of clock
-    def cont_scan(self, detune_low, detune_high):
+    def cont_scan(self, detune_low, detune_high, rounds=1):
         start_t = time.time()
         res_freqs = []
+        res_freqs_error = []
         res_times = []
 
-        for _ in tqdm(range(100), desc="scanning..."):
-            scan = self.single_scan(
+        for _ in tqdm(range(rounds), desc="scanning..."):
+            scan, perr = self.single_scan(
                 detune_low=detune_low, 
                 detune_high=detune_high)
 
-            res_freqs.append(scan)
-            res_times.append(time.time() - start_t) 
+            if scan is not None:
+                res_freqs.append(scan)
+                res_freqs_error.append(perr)
+                res_times.append(time.time() - start_t) 
 
-        # plot = PlotObject(
-        #     x_label="ellapsed time [S]",
-        #     y_label="detuning frequency [Hz]",
-        #     show_annotate=True)
 
-        # plot.plot_points(res_times, res_freqs)
-        # plot.show_plot()
+        plot = PlotObject(
+            x_label="ellapsed time [S]",
+            y_label="detuning frequency [Hz]",
+            show_annotate=True)
+        
+        print(res_freqs)
+        print(res_freqs_error)
+
+        plot.plot_points(res_times, res_freqs, res_freqs_error)
+        plot.show_plot()
